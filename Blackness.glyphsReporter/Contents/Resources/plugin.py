@@ -53,12 +53,60 @@ class Blackness(ReporterPlugin):
 			'en': u'Blackness',
 			'zh': u'灰度',
 		})
-		# self.generalContextMenus = [{
-		# 	'name': Glyphs.localize({
-		# 		'en': u'Use Bounding Box',
-		# 		'zh': u'使用边界框',
-		# 	}),
-		# }]
+		self.displayBlacknessRect = True
+		self.displayBlacknessValue = False
+		self.generalContextMenus = self.buildContextMenus()
+
+	@objc.python_method
+	def buildContextMenus(self, sender=None):
+		return [
+			{
+				'name': Glyphs.localize({
+					'en': 'Blackness Options:',
+					'zh': u'灰度选项：',
+					}), 
+				'action': None,
+			},
+			# TODO:
+			# {
+			# 	'name': Glyphs.localize({
+			# 		'en': u'Use Bounding Box',
+			# 		'zh': u'使用边界框',
+			# 	}),
+			# 	'action': None,
+			# },
+			# {
+			# 	'name': Glyphs.localize({
+			# 		'en': u'Rescale Blackness',
+			# 		'zh': u'重缩放灰度值',
+			# 	}),
+			# 	'action': None,
+			# },
+			{
+				'name': Glyphs.localize({
+					'en': u'Display Blackness Rectangle',
+					'zh': u'显示灰度色块',
+				}),
+				'action': self.toggleBlacknessRect,
+				'state': self.displayBlacknessRect,
+			},
+			{
+				'name': Glyphs.localize({
+					'en': u'Display Blackness Value',
+					'zh': u'显示灰度数值',
+				}),
+				'action': self.toggleBlacknessValue,
+				'state': self.displayBlacknessValue,
+			},
+		]
+
+	def toggleBlacknessRect(self):
+		self.displayBlacknessRect = not self.displayBlacknessRect
+		self.generalContextMenus = self.buildContextMenus()
+
+	def toggleBlacknessValue(self):
+		self.displayBlacknessValue = not self.displayBlacknessValue
+		self.generalContextMenus = self.buildContextMenus()
 
 	@objc.python_method
 	def foreground(self, layer):
@@ -75,11 +123,14 @@ class Blackness(ReporterPlugin):
 		descender = self.descender(layer)
 		width = layer.width
 		height = ascender - descender
-		# Use sqrt to rescale the blackness
+		# TODO: use sqrt to rescale the blackness (or not)
 		blackness = math.sqrt(self.area(layer) / (width * height))
-		# 0 = black, 1 = white
-		NSColor.colorWithWhite_alpha_(1 - blackness, 1.0).set()
-		NSBezierPath.fillRect_(((0, descender), (width, height)))
+		if self.displayBlacknessRect:
+			# 0 = black, 1 = white
+			NSColor.colorWithWhite_alpha_(1 - blackness, 1.0).set()
+			NSBezierPath.fillRect_(((0, descender), (width, height)))
+		if self.displayBlacknessValue:
+			self.drawTextAtPoint('{:2.1f}%'.format(blackness * 100), NSPoint(0, descender))
 
 	@objc.python_method
 	def ascender(self, layer):
