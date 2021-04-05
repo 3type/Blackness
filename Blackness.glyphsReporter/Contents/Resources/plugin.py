@@ -15,7 +15,6 @@ import copy
 import math
 import objc
 from fontTools.pens.areaPen import AreaPen
-from Foundation import *
 from GlyphsApp import *
 from GlyphsApp.plugins import *
 
