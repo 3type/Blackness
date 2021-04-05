@@ -134,7 +134,7 @@ class Blackness(ReporterPlugin):
 	@objc.python_method
 	def ascender(self, layer):
 		if Glyphs.versionNumber >= 3.0:
-			return next(m.position for m in layer.metrics if 'Ascender' in m.name)
+			return next(m.position for m in layer.metrics if m.metric.typeName() == 'ascender')
 		master = layer.master
 		ascender = master.ascender
 		for param in filter(lambda x: x.name == 'ascender', master.customParameters):
@@ -149,7 +149,7 @@ class Blackness(ReporterPlugin):
 	@objc.python_method
 	def descender(self, layer):
 		if Glyphs.versionNumber >= 3.0:
-			return next(m.position for m in layer.metrics if 'Descender' in m.name)
+			return next(m.position for m in layer.metrics if m.metric.typeName() == 'descender')
 		master = layer.master
 		descender = master.descender
 		for param in filter(lambda x: x.name == 'descender', master.customParameters):
