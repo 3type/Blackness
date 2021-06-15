@@ -129,7 +129,13 @@ class Blackness(ReporterPlugin):
 			NSColor.colorWithWhite_alpha_(1 - blackness, 1.0).set()
 			NSBezierPath.fillRect_(((0, descender), (width, height)))
 		if self.displayBlacknessValue:
-			self.drawTextAtPoint('{:2.1f}%'.format(blackness * 100), NSPoint(0, descender))
+			if self.displayBlacknessRect:
+				fontColor = NSColor.whiteColor() if blackness > 0.4 else NSColor.blackColor()
+			else:
+				fontColor = NSColor.redColor()
+			self.drawTextAtPoint('{:2.1f}%'.format(blackness * 100),
+				textPosition=NSPoint(0, descender),
+				fontColor=fontColor)
 
 	@objc.python_method
 	def ascender(self, layer):
